@@ -2,12 +2,12 @@ var getPort = require('get-server-port')
 var tape = require('tape')
 var http = require('http')
 
-var serverRouter = require('./')
+var ServerRouter = require('./')
 
 tape('server-router', function (t) {
   t.test('should assert input types', function (t) {
     t.plan(1)
-    t.throws(serverRouter.bind(null, 1235), /object/)
+    t.throws(new ServerRouter(null), /object/)
   })
 
   t.test('should register a single callback on GET', function (t) {
@@ -15,7 +15,7 @@ tape('server-router', function (t) {
     var a = false
     var b = false
 
-    var router = serverRouter()
+    var router = new ServerRouter()
     router.route('GET', '/', function (req, res, ctx) {
       t.pass('/ called')
       res.end()
@@ -42,7 +42,7 @@ tape('server-router', function (t) {
   t.test('should register a default path', function (t) {
     t.plan(1)
 
-    var router = serverRouter({ default: '/foo' })
+    var router = new ServerRouter({ default: '/foo' })
     router.route('GET', '/foo', function (req, res, ctx) {
       t.pass('/foo called')
       res.end()
@@ -60,9 +60,9 @@ tape('server-router', function (t) {
   t.test('should create params', function (t) {
     t.plan(1)
 
-    var router = serverRouter({ default: '/foo' })
-    router.route('GET', '/foo/:bar', function (req, res, ctx) {
-      t.equal(ctx.params.bar, 'hi-there')
+    var router = new ServerRouter({ default: '/foo' })
+    router.route('GET', '/foo/:bar', function (req, res, params) {
+      t.equal(params.bar, 'hi-there')
       res.end()
       server.close()
     })
@@ -78,7 +78,7 @@ tape('server-router', function (t) {
   t.test('should handle encoded characters', function (t) {
     t.plan(1)
 
-    var router = serverRouter({ default: '/foo' })
+    var router = new ServerRouter({ default: '/foo' })
     router.route('GET', '/foo bar', function (req, res, ctx) {
       t.pass('called')
       res.end()
@@ -96,7 +96,7 @@ tape('server-router', function (t) {
   t.test('should handle routes when calling start', function (t) {
     t.plan(1)
 
-    var router = serverRouter()
+    var router = new ServerRouter()
 
     router.route('GET', '/hello', function (req, res, ctx) {
       t.pass('/hello called')
@@ -111,7 +111,7 @@ tape('server-router', function (t) {
   t.test('should handle an array of methods', function (t) {
     t.plan(5)
 
-    var router = serverRouter()
+    var router = new ServerRouter()
     router.route(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/foo', function (req, res, ctx) {
       t.pass(req.method + ' called')
       res.end()
@@ -122,7 +122,9 @@ tape('server-router', function (t) {
       makeRequest('POST', '/foo', function () {
         makeRequest('PUT', '/foo', function () {
           makeRequest('DELETE', '/foo', function () {
-            makeRequest('PATCH', '/foo')
+            makeRequest('PATCH', '/foo', function () {
+              server.close()
+            })
           })
         })
       })

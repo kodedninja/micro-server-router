@@ -3,46 +3,37 @@ var urlencode = require('urlencode')
 var wayfarer = require('wayfarer')
 var assert = require('assert')
 
-module.exports = ServerRouter
-
-function ServerRouter (opts) {
-  if (!(this instanceof ServerRouter)) return new ServerRouter(opts)
-
-  opts = opts || {}
-  assert.equal(typeof opts, 'object', 'server-router: opts should be type object')
-  this._router = wayfarer()
-}
-
-ServerRouter.prototype.route = function (method, route, handler) {
-  assert.ok(typeof method === 'string' || Array.isArray(method), 'server-router.route: method should be type string or array')
-  assert.equal(typeof route, 'string', 'server-router.route: route should be type string')
-  assert.equal(typeof handler, 'function', 'server-router.route: handler should be type function')
-
-  if (Array.isArray(method)) {
-    var methodRoute = null
-    for (var i = 0; i < method.length; i++) {
-      methodRoute = method[i] + '/' + route.replace(/^[#/]/, '')
-      this._router.on(methodRoute, function (params, req, res) {
-        handler(req, res, params)
-      })
-    }
-  } else {
-    route = method.toUpperCase() + '/' + route.replace(/^[#/]/, '')
-    this._router.on(route, function (params, req, res) {
-      handler(req, res, params)
-    })
+module.exports = class ServerRouter {
+  constructor (opts) {
+    opts = opts || {}
+    assert.equal(typeof opts, 'object', 'micro-server-router: opts should be type object')
+    this._router = wayfarer(opts.default ? 'GET' + opts.default : null)
   }
-}
 
-ServerRouter.prototype.match = function (req, res) {
-  var uri = urlencode.decode(pathname(req.url)) || '/'
-  uri = req.method + uri
-  return this._router(uri, req, res)
-}
+  route (method, route, handler) {
+    assert.ok(typeof method === 'string' || Array.isArray(method), 'micro-server-router.route: method should be type string or array')
+    assert.equal(typeof route, 'string', 'micro-server-router.route: route should be type string')
+    assert.equal(typeof handler, 'function', 'micro-server-router.route: handler should be type function')
 
-ServerRouter.prototype.start = function () {
-  var self = this
-  return function (req, res) {
-    self.match(req, res)
+    if (Array.isArray(method)) {
+      var methodRoute = null
+      for (var i = 0; i < method.length; i++) {
+        methodRoute = method[i].toUpperCase() + '/' + route.replace(/^[#/]/, '')
+        this._router.on(methodRoute, (params, req, res) => handler(req, res, params))
+      }
+    } else {
+      route = method.toUpperCase() + '/' + route.replace(/^[#/]/, '')
+      this._router.on(route, (params, req, res) => handler(req, res, params))
+    }
+  }
+
+  match (req, res) {
+    var uri = urlencode.decode(pathname(req.url)) || '/'
+    uri = req.method + uri
+    return this._router(uri, req, res)
+  }
+
+  start () {
+    return (req, res) => this.match(req, res)
   }
 }

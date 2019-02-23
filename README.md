@@ -1,30 +1,25 @@
-# server-router [![stability][0]][1]
-[![npm version][2]][3] [![build status][4]][5] [![test coverage][6]][7]
-[![downloads][8]][9] [![js-standard-style][10]][11]
+# micro-server-router
 
 Performant [radix-trie](https://en.wikipedia.org/wiki/Radix_tree) router for
-streaming servers.
+Zeit's [Micro](https://github.com/zeit/micro).
+
+Fork of [yoshuawuyts]https://github.com/yoshuawuyts/' [server-router](https://github.com/yoshuawuyts/server-router/) and modified for Micro.
 
 ## Usage
 ```js
-var serverRouter = require('server-router')
-var http = require('http')
+const MicroServerRouter = require('micro-server-router')
 
-var router = serverRouter()
+const router = new MicroServerRouter()
 
-router.route('GET', '/hello', function (req, res, ctx) {
-  res.end('hello world')
-})
+router.route('POST', '/hello', () => 'world')
+router.route('GET', '*', () => 'nothing')
 
-router.route('PUT', '/hello/:name', function (req, res, params) {
-  res.end('hi there ' + params.name)
-})
+module.exports = router.start()
 
-http.createServer(router.start()).listen()
 ```
 
 ## API
-### router = serverRouter(opts)
+### router = new MicroSeverRouter(opts)
 Create a new router with opts.
 
 ### router.route(method|routes, route, function(req, res, params))
@@ -36,8 +31,7 @@ matched partials from the route.
 Match a route on a router.
 
 ### handler = router.start()
-Return a function that can be passed directly to `http.createServer()` and
-calls `router.match()`.
+Return a function that can be passed directly to Micro.
 
 ## Installation
 ```sh
@@ -45,6 +39,7 @@ $ npm install server-router
 ```
 
 ## See Also
+- [server-router](https://github.com/yoshuawuyts/server-router) - original version
 - [wayfarer](https://github.com/yoshuawuyts/wayfarer) - vanilla radix-trie
   router
 - [nanorouter](https://github.com/yoshuawuyts/nanorouter) - client-side
@@ -52,17 +47,3 @@ $ npm install server-router
 
 ## License
 [MIT](https://tldrlegal.com/license/mit-license)
-
-[0]: https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square
-[1]: https://nodejs.org/api/documentation.html#documentation_stability_index
-[2]: https://img.shields.io/npm/v/server-router.svg?style=flat-square
-[3]: https://npmjs.org/package/server-router
-[4]: https://img.shields.io/travis/yoshuawuyts/server-router/master.svg?style=flat-square
-[5]: https://travis-ci.org/yoshuawuyts/server-router
-[6]: https://img.shields.io/codecov/c/github/yoshuawuyts/server-router/master.svg?style=flat-square
-[7]: https://codecov.io/github/yoshuawuyts/server-router
-[8]: http://img.shields.io/npm/dm/server-router.svg?style=flat-square
-[9]: https://npmjs.org/package/server-router
-[10]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
-[11]: https://github.com/feross/standard
-[12]: https://github.com/yoshuawuyts/wayfarer
