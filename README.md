@@ -35,7 +35,7 @@ Return a function that can be passed directly to Micro.
 
 ## Installation
 ```sh
-$ npm install server-router
+$ npm install micro-server-router
 ```
 
 ## See Also
