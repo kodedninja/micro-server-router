@@ -3,7 +3,7 @@
 Performant [radix-trie](https://en.wikipedia.org/wiki/Radix_tree) router for
 Zeit's [Micro](https://github.com/zeit/micro).
 
-Fork of [yoshuawuyts]https://github.com/yoshuawuyts/' [server-router](https://github.com/yoshuawuyts/server-router/) and modified for Micro.
+Fork of [yoshuawuyts](https://github.com/yoshuawuyts/)' [server-router](https://github.com/yoshuawuyts/server-router/), modified for compatibility with Micro.
 
 ## Usage
 ```js
