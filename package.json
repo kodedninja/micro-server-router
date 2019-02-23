@@ -1,6 +1,6 @@
 {
   "name": "micro-server-router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Server router for Micro",
   "main": "index.js",
   "scripts": {
